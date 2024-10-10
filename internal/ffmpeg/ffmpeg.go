@@ -2,16 +2,16 @@ package ffmpeg
 
 import (
 	"errors"
+	"fmt"
 	"unsafe"
 )
 
 // #cgo pkg-config: libavutil libavformat
 // #include <libavformat/avformat.h>
-// #include "util.h"
+// #include "clib.h"
 import "C"
 
 func init() {
-
 }
 
 type FFMPEG struct {
@@ -63,7 +63,10 @@ func (f *FFMPEG) Open(url string) error {
 	*/
 
 	var avInputFormat *C.AVInputFormat = nil
-	print(avInputFormat)
+	fmt.Println(avInputFormat)
+
+	C.av_probe_input_buffer2(f.ioctx, &avInputFormat, cstr, nil, 0, 0)
+	fmt.Println(avInputFormat)
 
 	if i := C.av_find_best_stream(f.fmtctx, C.AVMEDIA_TYPE_AUDIO, -1, -1, nil, 0); i == C.AVERROR_STREAM_NOT_FOUND {
 		return errors.New("stream not found")

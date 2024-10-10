@@ -1,5 +1,5 @@
 
-#include "util.h"
+#include "clib.h"
 #include <stdlib.h>
 
 extern "C" {
@@ -31,8 +31,8 @@ int ffmpeg_init_context(void* opaque, AVFormatContext **ctx, AVIOContext **ioctx
 		buffersz,
 		1,
 		opaque, // USER DATA GOES HERE
-		&FfmpegReader, // read
-		NULL, // write
+		NULL, // read from user
+		&FfmpegWriter, // write to user
 		NULL // seek
 	);
 
