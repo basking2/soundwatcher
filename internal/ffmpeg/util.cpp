@@ -1,9 +1,17 @@
-#include "util.h"
 
+#include "util.h"
 #include <stdlib.h>
 
 extern "C" {
-#include <libavutil/error.h>
+	#include <libavformat/avformat.h>
+	#include <libavformat/avio.h>
+	#include <libavutil/error.h>
+	#include <libavutil/attributes.h>
+	#include <libavutil/dict.h>
+	#include <libavutil/log.h>
+	#include <libavutil/mem.h>
+
+	#include "_cgo_export.h"
 }
 
 char * ffmpeg_error(int i) {
@@ -12,4 +20,40 @@ char * ffmpeg_error(int i) {
 	av_strerror(i, errstr, AV_ERROR_MAX_STRING_SIZE);
 
 	return errstr;
+}
+
+int ffmpeg_init_context(void* opaque, AVFormatContext **ctx, AVIOContext **ioctx) {
+	*ctx = NULL;
+	int buffersz = 102400;
+
+	*ioctx = avio_alloc_context(
+		(unsigned char*)av_malloc(buffersz),
+		buffersz,
+		1,
+		opaque, // USER DATA GOES HERE
+		&FfmpegReader, // read
+		NULL, // write
+		NULL // seek
+	);
+
+	*ctx = avformat_alloc_context();
+	if (ctx == NULL) {
+		return AVERROR(ENOMEM);
+	}
+
+	(*ctx)->pb = *ioctx;
+
+	return 0;
+}
+
+int ffmpeg_free_context(AVFormatContext *ctx, AVIOContext *ioctx) {
+	if (ctx != NULL) {
+		avformat_free_context(ctx);
+	}
+
+	if (ioctx != NULL) {
+		av_free(ioctx->buffer);
+		avio_context_free(&ioctx);
+	}
+	return 0;
 }
