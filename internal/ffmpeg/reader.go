@@ -1,6 +1,9 @@
 package ffmpeg
 
-import "unsafe"
+import (
+	"fmt"
+	"unsafe"
+)
 
 // #include <stdint.h>
 import "C"
@@ -10,9 +13,11 @@ func FfmpegReader(opaque unsafe.Pointer, buf *C.uint8_t, buf_size C.int) C.int {
 	ffmpeg := (*FFMPEG)(opaque)
 
 	if ffmpeg == nil {
-		panic("NIL!?")
+		return -1
 	}
 
-	println(buf_size)
-	return 0
+	gobuf := C.GoBytes(unsafe.Pointer(buf), buf_size)
+
+	fmt.Println(buf_size, gobuf[0:20])
+	return buf_size
 }

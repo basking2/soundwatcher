@@ -24,7 +24,7 @@ char * ffmpeg_error(int i) {
 
 int ffmpeg_init_context(void* opaque, AVFormatContext **ctx, AVIOContext **ioctx) {
 	*ctx = NULL;
-	int buffersz = 102400;
+	int buffersz = 1024000;
 
 	*ioctx = avio_alloc_context(
 		(unsigned char*)av_malloc(buffersz),
