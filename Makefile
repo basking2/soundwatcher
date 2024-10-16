@@ -7,7 +7,7 @@ clean:
 	@echo none
 
 test:
-	go test -timeout 3s ./...
+	go test -v -timeout 3s ./...
 
 all:
 	goimports -w . && \

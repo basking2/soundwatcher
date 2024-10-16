@@ -2,11 +2,10 @@ package ffmpeg
 
 import (
 	"errors"
-	"fmt"
 	"unsafe"
 )
 
-// #cgo pkg-config: libavutil libavformat
+// #cgo pkg-config: libavutil libavformat libavcodec
 // #include <libavformat/avformat.h>
 // #include "clib.h"
 import "C"
@@ -49,7 +48,8 @@ func (f *FFMPEG) Open(url string) error {
 	cstr := C.CString(url)
 	defer C.free(unsafe.Pointer(cstr))
 
-	if i := C.avformat_open_input(&f.fmtctx, cstr, nil, nil); i != 0 {
+	if i := C.ffmpeg_read(unsafe.Pointer(f), f.fmtctx, f.ioctx, cstr); i != 0 {
+		//if i := C.avformat_open_input(&f.fmtctx, cstr, nil, nil); i != 0 {
 		return errorToString(i)
 	}
 
@@ -62,21 +62,23 @@ func (f *FFMPEG) Open(url string) error {
 		}
 	*/
 
-	var avInputFormat *C.AVInputFormat = nil
-	fmt.Println(avInputFormat)
+	//var avInputFormat *C.AVInputFormat = nil
+	//fmt.Println(avInputFormat)
 
-	C.av_probe_input_buffer2(f.ioctx, &avInputFormat, cstr, nil, 0, 0)
-	fmt.Println(avInputFormat)
+	//C.av_probe_input_buffer2(f.ioctx, &avInputFormat, cstr, nil, 0, 0)
+	//fmt.Println(avInputFormat)
 
-	if i := C.av_find_best_stream(f.fmtctx, C.AVMEDIA_TYPE_AUDIO, -1, -1, nil, 0); i == C.AVERROR_STREAM_NOT_FOUND {
-		return errors.New("stream not found")
-	} else if i == C.AVERROR_DECODER_NOT_FOUND {
-		return errors.New("decoder not found")
-	}
+	/*
+		if i := C.av_find_best_stream(f.fmtctx, C.AVMEDIA_TYPE_AUDIO, -1, -1, nil, 0); i == C.AVERROR_STREAM_NOT_FOUND {
+			return errors.New("stream not found")
+		} else if i == C.AVERROR_DECODER_NOT_FOUND {
+			return errors.New("decoder not found")
+		}
 
-	if i := C.av_read_play(f.fmtctx); i != 0 {
-		return errorToString(i)
-	}
+		if i := C.av_read_play(f.fmtctx); i != 0 {
+			return errorToString(i)
+		}
+	*/
 
 	return nil
 }

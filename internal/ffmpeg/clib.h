@@ -11,6 +11,7 @@ extern "C" {  // only need to export C interface if
 
 char * ffmpeg_error(int i);
 int ffmpeg_init_context(void* opque, AVFormatContext **ctx, AVIOContext **ioctx);
+int ffmpeg_read(void *opaque, AVFormatContext *ctx, AVIOContext *ioctx, const char *url);
 int ffmpeg_free_context(AVFormatContext *ctx, AVIOContext *ioctx);
 
 #ifdef __cplusplus
